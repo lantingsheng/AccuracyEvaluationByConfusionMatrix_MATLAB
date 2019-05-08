@@ -1,64 +1,64 @@
 function [ CM, OveAcc, Kappa, ProAcc, UserAcc, AveAcc ] = AccuracyEvaluationByConfusionMatrix( ImgResult, ImgTruth, Numofclass )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FUNCTION£¨ÊµÏÖ¹¦ÄÜ£©£º given the classification maps and the groundtruth, compute the confusion matrix and other evaluation metrics
-%                                          £¨¸ø³ö·ÖÀà½á¹ûÍ¼ºÍµØÃæÊµ¿öÍ¼£¬Í³¼Æ³ö»ìÏı¾ØÕóCM,CM(ij)±íÊ¾µÚiÀà±»·Ö
-%                                          µ½µÚjÀàµÄÊıÄ¿,²¢Í¨¹ı»ìÏı¾ØÕóCMµÃµ½ºâÁ¿·ÖÀà¾«¶ÈµÄ¸÷¸öÖ¸±ê£©           
-% INPUU ARGUMENTS£¨ ÊäÈë²ÎÊıËµÃ÷£©:  
-%           £¨·ÖÀà½á¹ûÍ¼£©£ºImgResult                      classification results
-%           £¨µØÃæÊµ¿öÍ¼£©: ImgTruth                       groundtruth
-%           £¨Àà±ğÊıÄ¿£©:   Numberofclass                  number of the classes
-% OUTPUT ARGUMENTS£¨Êä³ö²ÎÊıËµÃ÷£©:
-%           £¨µÃµ½µÄ»ìÏı¾ØÕó£©£ºCM                         confusion matrix
-%           £¨×ÜÌå·ÖÀà¾«¶È£©:OveAcc                        overall accuracy
-%           £¨KappaÏµÊı£©£ºKappa                           Kappa coefficient
-%           £¨ÖÆÔìÕß¾«¶ÈÏòÁ¿£©£ºProAcc                     producer accuracy
-%           £¨ÓÃ»§¾«¶ÈÏòÁ¿£©£ºUserAcc                      user accuracy
-%           £¨Æ½¾ù¾«¶ÈÏòÁ¿(2Î¬)£©: AveAcc                  average accuracy
-% EXAMPLE£¨Ê¹ÓÃ¾ÙÀı£©:
-%           £¨×Ô¼º¹¹ÔìºÃ¸÷ÖÖ¾ØÕó¼´¿É£©
+% FUNCTIONï¼ˆå®ç°åŠŸèƒ½ï¼‰ï¼š given the classification maps and the groundtruth, compute the confusion matrix and other evaluation metrics
+%                                          ï¼ˆç»™å‡ºåˆ†ç±»ç»“æœå›¾å’Œåœ°é¢å®å†µå›¾ï¼Œç»Ÿè®¡å‡ºæ··æ·†çŸ©é˜µCM,CM(ij)è¡¨ç¤ºç¬¬iç±»è¢«åˆ†
+%                                          åˆ°ç¬¬jç±»çš„æ•°ç›®,å¹¶é€šè¿‡æ··æ·†çŸ©é˜µCMå¾—åˆ°è¡¡é‡åˆ†ç±»ç²¾åº¦çš„å„ä¸ªæŒ‡æ ‡ï¼‰           
+% INPUT ARGUMENTSï¼ˆ è¾“å…¥å‚æ•°è¯´æ˜ï¼‰:  
+%           ï¼ˆåˆ†ç±»ç»“æœå›¾ï¼‰ï¼šImgResult                      classification results
+%           ï¼ˆåœ°é¢å®å†µå›¾ï¼‰: ImgTruth                       groundtruth
+%           ï¼ˆç±»åˆ«æ•°ç›®ï¼‰:   Numberofclass                  number of the classes
+% OUTPUT ARGUMENTSï¼ˆè¾“å‡ºå‚æ•°è¯´æ˜ï¼‰:
+%           ï¼ˆå¾—åˆ°çš„æ··æ·†çŸ©é˜µï¼‰ï¼šCM                         confusion matrix
+%           ï¼ˆæ€»ä½“åˆ†ç±»ç²¾åº¦ï¼‰:OveAcc                        overall accuracy
+%           ï¼ˆKappaç³»æ•°ï¼‰ï¼šKappa                           Kappa coefficient
+%           ï¼ˆåˆ¶é€ è€…ç²¾åº¦å‘é‡ï¼‰ï¼šProAcc                     producer accuracy
+%           ï¼ˆç”¨æˆ·ç²¾åº¦å‘é‡ï¼‰ï¼šUserAcc                      user accuracy
+%           ï¼ˆå¹³å‡ç²¾åº¦å‘é‡(2ç»´)ï¼‰: AveAcc                  average accuracy
+% EXAMPLEï¼ˆä½¿ç”¨ä¸¾ä¾‹ï¼‰:
+%           ï¼ˆè‡ªå·±æ„é€ å¥½å„ç§çŸ©é˜µå³å¯ï¼‰
 %           [ CM, OveAcc, Kappa, ProAcc, UserAcc, AveAcc ] = AccuracyEvaluationByConfusionMatrix( ImgResult, ImgTruth, Numofclass )
-% SYMBOL INSTRUCTION£¨·ûºÅËµÃ÷£©£º
-%           see the code£¨¼û´úÂë£©                      
-% AUTHOR£¨×÷Õß£©:
+% SYMBOL INSTRUCTIONï¼ˆç¬¦å·è¯´æ˜ï¼‰ï¼š
+%           see the codeï¼ˆè§ä»£ç ï¼‰                      
+% AUTHORï¼ˆä½œè€…ï¼‰:
 %           Hui Qv           
 %           Beihang University, School of Astronautics, Center of Image Processing
-%          £¨±±¾©º½¿Õº½Ìì´óÑ§ Óîº½Ñ§Ôº Í¼ÏñÖĞĞÄ Çú»Õ  2016.6.14£©
+%          ï¼ˆåŒ—äº¬èˆªç©ºèˆªå¤©å¤§å­¦ å®‡èˆªå­¦é™¢ å›¾åƒä¸­å¿ƒ æ›²å¾½  2016.6.14ï¼‰
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%% OBTAIN INFORMATION£¨»ñÈ¡ĞÅÏ¢£©
+%% OBTAIN INFORMATIONï¼ˆè·å–ä¿¡æ¯ï¼‰
   [m,n] = size(ImgTruth);
-  CM = zeros(Numofclass,Numofclass);                        %initialize the confusion matrix£¨³õÊ¼»¯»ìÏı¾ØÕó£©
+  CM = zeros(Numofclass,Numofclass);                        %initialize the confusion matrixï¼ˆåˆå§‹åŒ–æ··æ·†çŸ©é˜µï¼‰
 
-%% OBTAIN THE CONFUSION MATRIX£¨»ñÈ¡»ìÏı¾ØÕó£©   
+%% OBTAIN THE CONFUSION MATRIXï¼ˆè·å–æ··æ·†çŸ©é˜µï¼‰   
   for i=1:m
       for j=1:n
           if(ImgTruth(i,j)==0)
               continue;
           end
-          t=ImgResult(i,j);                                  %obtain the  label from the classification result£¨»ñÈ¡½á¹ûÍ¼·ÖÀàÖµ£©
-          k=ImgTruth(i,j);                                   %obtain the true label£¨»ñÈ¡µØÃæÊµ¿öÍ¼Êµ¼ÊÖµ£©
-          CM(k,t)=CM(k,t)+1;                                 %confusion matrix assignment£¨»ìÏı¾ØÕó¸³Öµ£©
+          t=ImgResult(i,j);                                  %obtain the  label from the classification resultï¼ˆè·å–ç»“æœå›¾åˆ†ç±»å€¼ï¼‰
+          k=ImgTruth(i,j);                                   %obtain the true labelï¼ˆè·å–åœ°é¢å®å†µå›¾å®é™…å€¼ï¼‰
+          CM(k,t)=CM(k,t)+1;                                 %confusion matrix assignmentï¼ˆæ··æ·†çŸ©é˜µèµ‹å€¼ï¼‰
       end
              
   end
-%% CALCULATE EVALUATION METRICS£¨¼ÆËã¸÷¸öÆÀ¼Û¾«¶È£©
+%% CALCULATE EVALUATION METRICSï¼ˆè®¡ç®—å„ä¸ªè¯„ä»·ç²¾åº¦ï¼‰
  [m,n] = size(CM);
-  r=m;                                                       %number of the classes£¨Àà±ğÊı£¬¼´r=m=n£©
-  rowsum=zeros(1,m);                                         %it is used to store the sum of the row valus£¨ÓÃÓÚ´æ´¢ĞĞºÍ£©
-  columnsum=zeros(1,n);                                      %it is used to store the sum of the column valus£¨ÓÃÓÚ´æ´¢ÁĞºÍ£©
-  N=0;                                                       %it is used to store the total number of the pixels£¨ÓÃÓÚ´æ´¢ÏñËØ×ÜÊı£©
-  Diagsum=0;                                                 %sum of the diag£¨¶Ô½ÇÏßºÍ£©
-  ProAcc=zeros(m,1);                                         %store the producer accuracy for every class£¨ÓÃÓÚ´æ´¢¸÷¸öÀàµÄÖÆÔìÕß·ÖÀà¾«¶È(ÁĞÏòÁ¿)£©
-  UserAcc=zeros(m,1);                                        %store the user accuracy for every class£¨ÓÃÓÚ´æ´¢¸÷¸öÀàµÄÊ¹ÓÃÕß·ÖÀà¾«¶È(ÁĞÏòÁ¿)£©
-  AveAcc=zeros(2,1);                                         %store the average producer and user accuracy £¨µÚÒ»Ïî´æ´¢Æ½¾ùÖÆÔìÕß¾«¶È£¬µÚ¶şÏî´æ´¢Æ½¾ùÊ¹ÓÃÕß¾«¶È£©
+  r=m;                                                       %number of the classesï¼ˆç±»åˆ«æ•°ï¼Œå³r=m=nï¼‰
+  rowsum=zeros(1,m);                                         %it is used to store the sum of the row valusï¼ˆç”¨äºå­˜å‚¨è¡Œå’Œï¼‰
+  columnsum=zeros(1,n);                                      %it is used to store the sum of the column valusï¼ˆç”¨äºå­˜å‚¨åˆ—å’Œï¼‰
+  N=0;                                                       %it is used to store the total number of the pixelsï¼ˆç”¨äºå­˜å‚¨åƒç´ æ€»æ•°ï¼‰
+  Diagsum=0;                                                 %sum of the diagï¼ˆå¯¹è§’çº¿å’Œï¼‰
+  ProAcc=zeros(m,1);                                         %store the producer accuracy for every classï¼ˆç”¨äºå­˜å‚¨å„ä¸ªç±»çš„åˆ¶é€ è€…åˆ†ç±»ç²¾åº¦(åˆ—å‘é‡)ï¼‰
+  UserAcc=zeros(m,1);                                        %store the user accuracy for every classï¼ˆç”¨äºå­˜å‚¨å„ä¸ªç±»çš„ä½¿ç”¨è€…åˆ†ç±»ç²¾åº¦(åˆ—å‘é‡)ï¼‰
+  AveAcc=zeros(2,1);                                         %store the average producer and user accuracy ï¼ˆç¬¬ä¸€é¡¹å­˜å‚¨å¹³å‡åˆ¶é€ è€…ç²¾åº¦ï¼Œç¬¬äºŒé¡¹å­˜å‚¨å¹³å‡ä½¿ç”¨è€…ç²¾åº¦ï¼‰
   for i=1:m                                                           
       for j=1:n
-          rowsum(i)=rowsum(i)+CM(i,j);                       % sum of the rows and columns£¨ĞĞÁĞºÍÍ³¼Æ£©
+          rowsum(i)=rowsum(i)+CM(i,j);                       % sum of the rows and columnsï¼ˆè¡Œåˆ—å’Œç»Ÿè®¡ï¼‰
           columnsum(j)=columnsum(j)+CM(i,j);
-          N=N+CM(i,j);                                       % compute the total number of the pixels£¨¼ÆËãÏñËØ×ÜÊı£©
+          N=N+CM(i,j);                                       % compute the total number of the pixelsï¼ˆè®¡ç®—åƒç´ æ€»æ•°ï¼‰
           if(i==j)
-              Diagsum=Diagsum+CM(i,i);                       % compute the sum of the pixels which are rightly classified £¨Í³¼Æ·ÖÀàÕıÈ·µÄÏñËØ×ÜÊı£©
+              Diagsum=Diagsum+CM(i,i);                       % compute the sum of the pixels which are rightly classified ï¼ˆç»Ÿè®¡åˆ†ç±»æ­£ç¡®çš„åƒç´ æ€»æ•°ï¼‰
           end
       end
   end
@@ -67,7 +67,7 @@ function [ CM, OveAcc, Kappa, ProAcc, UserAcc, AveAcc ] = AccuracyEvaluationByCo
   for i=1:r
       Pc=Pc+rowsum(i)*columnsum(i);
   end
- %% CALCULATE THE METRICS£¨¼ÆËã¾«¶ÈÖ¸±ê£©
+ %% CALCULATE THE METRICSï¼ˆè®¡ç®—ç²¾åº¦æŒ‡æ ‡ï¼‰
   Kappa=(N*Diagsum-Pc)/(N*N-Pc);
   OveAcc=Diagsum/N;
  for i=1:m
